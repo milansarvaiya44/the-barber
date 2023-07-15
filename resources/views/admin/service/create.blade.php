@@ -9,6 +9,8 @@
                 </div>
                 <form class="form-horizontal" id="create_service_form" method="post" enctype="multipart/form-data" action="{{url('/admin/services/store')}}">
                     @csrf
+
+                    <input type="hidden" name="emp_id" id="emp_id" value="{{$id}}">
                     <div class="my-0">
                         <div class="form-group">
                             <label class="form-control-label" for="name">{{__('Service Name')}}</label>

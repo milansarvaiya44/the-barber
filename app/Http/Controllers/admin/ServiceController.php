@@ -12,12 +12,12 @@ use App\AdminSetting;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index($id = 0)
     {
         $salon = Salon::where('owner_id', Auth()->user()->id)->first();
         if(isset($salon->salon_id))
         {
-            $services = Service::where([['salon_id', $salon->salon_id],['isdelete',0]])
+            $services = Service::where([['salon_id', $salon->salon_id],['emp_id', $id],['isdelete',0]])
             ->with(['category'])
             ->orderBy('service_id', 'DESC')
             ->paginate(10);
@@ -29,7 +29,7 @@ class ServiceController extends Controller
 
         $categories = Category::where('status',1)->get();
         $symbol = AdminSetting::find(1)->currency_symbol;
-        return view('admin.pages.service', compact('services','categories','symbol'));
+        return view('admin.pages.service', compact('services','categories','symbol','id'));
     }
 
     public function create()
@@ -66,6 +66,7 @@ class ServiceController extends Controller
         $service->time = $request->time;
         $service->cat_id = $request->cat_id;
         $service->salon_id = $salon->salon_id;
+        $service->emp_id = $request->emp_id;
         $service->save();
         return response()->json(['success' => true,'data' => $service, 'msg' => 'Service create'], 200);
 
@@ -117,6 +118,7 @@ class ServiceController extends Controller
         $service->time = $request->time;
         $service->gender = $request->gender;
         $service->cat_id = $request->cat_id;
+        $service->emp_id = $request->emp_id;
        
         $service->save();
         return response()->json(['success' => true,'data' => $service, 'msg' => 'Service edit'], 200);

@@ -36,21 +36,21 @@ class SettingController extends Controller
             'license_code' => 'required',
             'license_client_name' => 'required',
         ]);
-        $api = new LicenseBoxExternalAPI();
+        /*$api = new LicenseBoxExternalAPI();
         $activate_response = $api->activate_license($request->license_code, $request->license_client_name);
           
-        if($activate_response['status'] === true){
+        if($activate_response['status'] === true){*/
             $setting = AdminSetting::find(1);
             $setting->license_code = $request->license_code;
             $setting->license_client_name = $request->license_client_name;
             $setting->license_status = 1;
             $setting->save();
             return redirect('/admin/dashboard');
-        }
-        else{
+        // }
+      /*  else{
             return Redirect::back()->withStatus($activate_response['message']);
 
-        }
+        }*/
     }
 
     public function update(Request $request, $id)

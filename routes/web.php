@@ -33,6 +33,7 @@ Route::get('/clear-cache', function() {
 Route::post('/saveEnvData', 'Auth\LoginController@saveEnvData');
 Route::post('/savelicense', 'Auth\LoginController@savelicense');
 
+Route::get('/admin', 'Auth\LoginController@admin');
 Route::get('/admin/login', 'Auth\LoginController@admin');
 Route::post('/admin/login/verify', 'Auth\LoginController@login_verify');
 Route::get('/admin/salon/create', 'admin\SalonController@create');
@@ -82,10 +83,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function()
     //services
     Route::resource('/services', 'admin\ServiceController');
     Route::get('/services', 'admin\ServiceController@index');
+    Route::get('/services/emp/{id}', 'admin\ServiceController@index');
     Route::get('/services/{id}', 'admin\ServiceController@show');
     Route::get('/services/create', 'admin\ServiceController@create');
     Route::post('/services/store', 'admin\ServiceController@store');
     Route::get('/services/edit/{id}', 'admin\ServiceController@edit');
+    Route::get('/services/emp/edit/{id}', 'admin\ServiceController@edit');
     Route::post('/services/update/{id}', 'admin\ServiceController@update');
     Route::post('/services/hideService', 'admin\ServiceController@hideService');
     Route::get('/services/delete/{id}', 'admin\ServiceController@destroy');

@@ -66,6 +66,9 @@
                                         <button class="btn-white btn shadow-none p-0 m-0 table-action text-danger bg-white" onclick="deleteData('admin/employee',{{$emp->emp_id}},'{{$base_url}}')" data-toggle="tooltip" data-original-title="{{__('Delete employee')}}">
                                             <i class="fas fa-trash"></i>
                                         </button>
+                                        <a href="{{url('admin/services/emp/'.$emp->emp_id)}}" class="table-action text-success" data-toggle="tooltip" data-original-title="{{__('Add service')}}">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -6,7 +6,7 @@
                     <span class="h3">{{__('Create Gst/VatService_Charges')}}</span>
                     <button type="button" class="add_coupon close">&times;</button>
                 </div>
-                <form class="form-horizontal"  id="create_coupon_form" method="post" enctype="multipart/form-data" action="{{url('admin/gstvatservices/store')}}">
+                <form class="form-horizontal"  id="create_gstvatservices_form" method="post" enctype="multipart/form-data" action="{{url('admin/gstvatservices/store')}}">
                     @csrf
                     <div class="my-0">
                          {{-- <?php
@@ -79,8 +79,8 @@
                         </div> --}}
 
                         <div class="text-center">
-                            {{-- <button type="button" id="create_btn" onclick="all_create('create_gstvatservices_form','gstvatservices')" class="btn btn-primary rtl-float-none mt-4 mb-5">{{ __('Create') }}</button> --}}
-                        <button type="button" id="create_btn" onclick="all_create('create_coupon_form','coupon')" class="btn btn-primary">Create</button>
+                           <button type="button" id="create_btn" onclick="all_create('create_gstvatservices_form','gstvatservices')" class="btn btn-primary rtl-float-none mt-4 mb-5">{{ __('Create') }}</button>
+                        {{--  <button type="button" id="create_btn" onclick="all_create('create_coupon_form','coupon')" class="btn btn-primary">Create</button> --}}
                         </div>
                     </div>
                 </form>

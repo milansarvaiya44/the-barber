@@ -53,10 +53,10 @@
                                         @php
                                             $base_url = url('/');
                                         @endphp
-                                        <button class="btn-white btn shadow-none p-0 m-0 table-action text-warning bg-white" onclick="show_service({{$service->service_id}},'{{$base_url}}')" data-toggle="tooltip" data-original-title="{{__('View Service')}}">
+                                        <button class="btn-white btn shadow-none p-0 m-0 table-action text-warning bg-white" onclick="show_service({{$service->service_id}},'{{$base_url}}','admin/services')" data-toggle="tooltip" data-original-title="{{__('View Service')}}">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-white btn shadow-none p-0 m-0 table-action text-info bg-white" onclick="edit_service({{$service->service_id}},'{{$base_url}}')" data-toggle="tooltip" data-original-title="{{__('Edit Service')}}">
+                                        <button class="btn-white btn shadow-none p-0 m-0 table-action text-info bg-white" onclick="edit_service({{$service->service_id}},'{{$base_url}}','admin/services/edit')" data-toggle="tooltip" data-original-title="{{__('Edit Service')}}">
                                             <i class="fas fa-user-edit"></i>
                                         </button>
                                         <button class="btn-white btn shadow-none p-0 m-0 table-action text-danger bg-white" onclick="deleteData('admin/services',{{$service->service_id}},'{{$base_url}}')" data-toggle="tooltip" data-original-title="{{__('Delete Service')}}">

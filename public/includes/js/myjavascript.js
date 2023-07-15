@@ -706,8 +706,17 @@ function all_create(formID,url) {
     });
 }
 
-function all_edit(formID,url) { 
-    id = $("#"+formID+" input[name='id']").val();
+function all_edit(formID,url,new_url = '') { 
+
+     id = $("#"+formID+" input[name='id']").val();
+    if(new_url == ''){
+        new_url = url+'/update/'+id;
+    }else{
+        new_url = new_url+'/admin/services/update/'+id;
+    }
+
+
+   
     var formData = new FormData($('#'+formID)[0]);
     console.log('formData',formData);
     $.ajax({
@@ -716,7 +725,7 @@ function all_edit(formID,url) {
         },
        
         type:"POST",
-        url:url+'/update/'+id,
+        url:new_url,
         data:formData,
         cache:false,
         contentType: false,
@@ -841,13 +850,20 @@ function edit_gstvatservices(id,base_url) {
     });
 }
 
-function edit_service(id,base_url) {
+function edit_service(id,base_url,url = '') {
+    var url_set = "";
+    if(url == ''){
+        url_set = 'services/edit/'+id;    
+    }else{
+        url_set =  base_url+'/'+url+'/'+id;
+    }
+
     $.ajax({
         headers: {
             'XCSRF-TOKEN': csrf
         },
         type:"GET",
-        url:'services/edit/'+id,
+        url:url_set,
         success: function(result){
             $(".invalid-div span").html('');
             
@@ -994,12 +1010,21 @@ function approve_reported_review(url,id, base_url) {
     })      
 }
 
-function show_service(id,base_url) {
+function show_service(id,base_url,url = '') {
+
+    var url_set = "";
+    if(url == ''){
+        url_set = 'services/'+id;    
+    }else{
+        url_set = base_url+'/'+url+'/'+id;
+    }
+
+
     $.ajax({
         headers: { 'XCSRF-TOKEN': csrf
         },
         type:"GET",
-        url:'services/'+id,
+        url:url_set,
         success: function(result){
             $('#show_service_sidebar .salon_size').attr('src', base_url+'/storage/images/services/'+result.data.service.image);
             document.getElementById('service_name').innerHTML = result.data.service.name;
@@ -1106,10 +1131,19 @@ function eventClicked(e) {
             
             document.getElementById('app_payment').innerHTML = result.data.symbol+''+result.data.booking.payment;
             document.getElementById('booking_id_main').innerHTML = result.data.booking.booking_id;
-            document.getElementById('emp_name').innerHTML = result.data.booking.empDetails.name;
+
+            if(result.data.booking.empDetails != undefined){
+                document.getElementById('emp_name').innerHTML = result.data.booking.empDetails.name;    
+            }
+            
             document.getElementById('app_date').innerHTML = result.data.booking.date;
             document.getElementById('service_time').innerHTML = result.data.booking.start_time+' - '+result.data.booking.end_time;
             $('#show_booking_sidebar .view_invoice').attr('href', base_url+'/admin/booking/invoice/'+result.data.booking.id);
+
+
+
+            console.log('====');
+            console.log(result.data.booking.user.image);
             
             $('.user_img').attr('src', base_url+'/storage/images/users/'+result.data.booking.user.image);
             var a = result.data.booking.services
@@ -1125,6 +1159,9 @@ function eventClicked(e) {
         },
         error: function(err) {}
     })
+
+    // var span = document.getElementById('span');
+
     span.onclick = function() {
         modal.style.display = "none";
     }

@@ -9,6 +9,8 @@
                 <div class="mx-4">
                     <form class="form-horizontal" id="edit_service_form" action="#" method="post" enctype="multipart/form-data">
                         @csrf
+
+                        <input type="hidden" name="emp_id" id="emp_id" value="{{$id}}">
                         <div class="my-0">
                             <div class="form-group">
                                 <label class="form-control-label" for="name">{{__('Service Name')}}</label>
@@ -62,9 +64,11 @@
                             </div>
 
                             <input type="hidden" name="id">
-
+                            @php
+                                $base_url = url('/');
+                            @endphp
                             <div class="text-center">
-                                <button type="button" onclick="all_edit('edit_service_form','services')" class="btn btn-primary rtl-float-none mt-4 mb-5">{{ __('Save Changes') }}</button>
+                                <button type="button" onclick="all_edit('edit_service_form','services','{{$base_url}}')" class="btn btn-primary rtl-float-none mt-4 mb-5">{{ __('Save Changes') }}</button>
                             </div>
                         </div>
                     </form>
