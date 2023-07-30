@@ -33,7 +33,7 @@ Route::post('/generateCardToken', 'api\StripeController@generateCardToken');
 Route::post('/createInvoiceAndPayWithDebitCard', 'api\StripeController@createInvoiceAndPayWithDebitCard');
 Route::post('/card_chk', 'api\StripeController@card_chk');
 
-Route::post('/register', 'api\UserApiController@register');
+Route::post('/register_new', 'api\UserApiController@register');
 Route::post('/register1', 'api\UserApiController@update');
 Route::post('/forgetpassword', 'api\UserApiController@forgetPassword');
 Route::post('/sendotp', 'api\UserApiController@sendotp');
