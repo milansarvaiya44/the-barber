@@ -105,11 +105,12 @@ class CalendarController extends Controller
         $emps = Employee::where([['status',1],['salon_id',$salon->salon_id]])->get();
         if(isset($salon->salon_id))
         {
-            $services = Service::where([['salon_id',$salon->salon_id],['isdelete',0]])->get();
+            $services = Service::where([['salon_id',$salon->salon_id],['emp_id', 0],['isdelete',0]])->get();
         }
         else
         {
-            $services = Service::get();
+            $services = Service::where([['emp_id', 0],['isdelete',0]])->get();
+            // $services = Service::get();
         }
        
 

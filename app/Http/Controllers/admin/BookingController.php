@@ -35,7 +35,8 @@ class BookingController extends Controller
             
             ->orderBy('id','DESC')
             ->paginate(8);
-            $services = Service::where([['salon_id',$salon->salon_id],['status',1]])->get();
+            // $services = Service::where([['salon_id',$salon->salon_id],['status',1]])->get();
+            $services = Service::where([['salon_id',$salon->salon_id],['emp_id', 0],['status',1]])->get();
             $emps = Employee::where([['status',1],['salon_id',$salon->salon_id]])->get();
             $enterpreneur=User::where([['status' , 0],['role' , 4]])->get();
         }    

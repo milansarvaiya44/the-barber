@@ -107,6 +107,13 @@
                     <span class="nav-link-text">{{__('Banner')}}</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('admin/video*')  ? 'active' : ''}}" href="{{url('admin/video')}}">
+                    <i class="fa fa-video  text-purple"></i>
+                    <span class="nav-link-text">{{__('Video')}}</span>
+                    </a>
+                </li>
                     
                 
                 <li class="nav-item">

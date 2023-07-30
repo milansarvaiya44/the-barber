@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Auth;
 use Hash;
 use App\User;
+use App\Media;
 use App\Salon;
 use App\Category;
 use App\Service;
@@ -35,16 +36,22 @@ use Stripe;
 use App\Template;
 use App\Notification;
 use App\UserCategory;
+use Illuminate\Support\Facades\Validator;
+
 
 class UserApiController extends Controller
 {
     // Login
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'bail|required|email',
             'password' => 'bail|required',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $userdata = array(
             'email' => $request->email,
             'password' => $request->password,
@@ -75,13 +82,27 @@ class UserApiController extends Controller
     public function register(Request $request) 
     {
     
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             // 'name' => 'bail|required',
             // 'code' => 'bail|required',
             // 'phone' => 'bail|required|numeric|unique:users',
             'email' => 'bail|required|email|unique:users',
             'password' => 'bail|required|min:8',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+       /* $validator = Validator::make($request->all(), [
+              'email' => 'bail|required|email|unique:users',
+              'password' => 'bail|required|min:8',
+          ]);
+
+          if ($validator->fails()) {
+              return response()->json(['errors' => $validator->errors()], 422);
+          }*/
+
+
         $user_verify = AdminSetting::first()->user_verify;
         $user_verify_sms = AdminSetting::first()->user_verify_sms;
         $user_verify_email = AdminSetting::first()->user_verify_email;
@@ -124,6 +145,7 @@ class UserApiController extends Controller
                     $token = AdminSetting::first()->twilio_auth_token;
                     $data = ["{{UserName}}", "{{OTP}}","{{AdminName}}"];
                     $message1 = str_replace($data, $detail, $msg_content);
+                    // die('01');
                     try{
                         $client = new Client($sid, $token);
                         $client->messages->create(
@@ -137,6 +159,7 @@ class UserApiController extends Controller
                     catch(\Throwable $th){}
                 } 
                 if($user_verify_email== 1){
+                    // die('02');
                     try{
                         Mail::to($user->email)->send(new OTP($content,$detail));
                     }
@@ -190,9 +213,12 @@ class UserApiController extends Controller
     // send OTP
     public function sendotp(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'bail|required|email',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         $user = User::where([['role',3],['email',$request->email]])->first();
         if($user)
         {
@@ -255,9 +281,12 @@ class UserApiController extends Controller
     // Resend OTP
     public function resendotp(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'user_id' => 'bail|required',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         $user = User::where([['role',3],['id',$request->user_id]])->first();
         if($user)
         {
@@ -321,10 +350,13 @@ class UserApiController extends Controller
     // Check OTP
     public function checkotp(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'otp' => 'bail|required|digits:4',
             'user_id' => 'bail|required',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $user = User::find($request->user_id);
         if($user->otp == $request->otp || $request->otp == "1111")
@@ -344,11 +376,14 @@ class UserApiController extends Controller
     // Change password
     public function changePassword(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'oldPassword' => 'bail|required',
             'new_Password' => 'bail|required|min:8',
             'confirm' => 'bail|required|same:new_Password',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         if (Hash::check($request->oldPassword, Auth::user()->password))
         {
@@ -364,9 +399,12 @@ class UserApiController extends Controller
     // Forget password
     public function forgetPassword(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'bail|required|email',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         $user = User::where([['role',3],['email',$request->email]])->first();
         if($user)
         {
@@ -452,6 +490,7 @@ class UserApiController extends Controller
     // Show user profile
     public function showUser()
     {
+        // die('stop');
         $user = User::where([['status',1],['role',3]])->with(['address:address_id,user_id,street,city,state,country,let,long'])
         ->find(Auth::user()->id,['id','name','image','email','code','phone']);
         return response()->json(['msg' => 'Get single user profile', 'data' => $user, 'success' => true], 200);
@@ -461,11 +500,14 @@ class UserApiController extends Controller
     {
         $user = User::where('role',3)->find(Auth::user()->id);
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'bail|required',
             'phone' => 'bail|required|numeric|unique:users,phone,' . Auth::user()->id . ',id',
             'code' => 'bail|required',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         $user->name = $request->name;
         $user->code = $request->code;
         $user->phone = $request->phone;
@@ -499,7 +541,7 @@ class UserApiController extends Controller
     {
         $address = new Address();
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'street' => 'bail|required',
             'city' => 'bail|required|regex:/^([^0-9]*)$/',
             'state' => 'bail|required|regex:/^([^0-9]*)$/',
@@ -507,6 +549,10 @@ class UserApiController extends Controller
             'let' => 'bail|required',
             'long' => 'bail|required',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         
         $address->user_id = Auth()->user()->id;
         $address->street = $request->street;
@@ -537,12 +583,20 @@ class UserApiController extends Controller
     // check coupon
     public function checkCoupon(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'code' => 'bail|required',
         ]);
 
-        $coupon = Coupon::where('code',$request->code)->first()
-        ->makeHidden('use_count','start_date','end_date','max_use','status','created_at','updated_at');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $coupon = Coupon::where('code',$request->code)->first();
+
+        if($coupon){
+           $coupon = $coupon->makeHidden('use_count','start_date','end_date','max_use','status','created_at','updated_at');    
+        }
+        
         if(!$coupon)
         {
             return response()->json(['msg' => 'coupon code is incorrect', 'success' => false], 200);
@@ -563,17 +617,21 @@ class UserApiController extends Controller
     // time slot
     public function timeSlot(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'date' => 'bail|required',
         ]);
+        if ($validator->fails()) {
+               return response()->json(['errors' => $validator->errors()], 422);
+           }
+
         $id = Salon::first()->salon_id;
 
         $master = array();
         $day = strtolower(Carbon::parse($request->date)->format('l'));
         $salon = Salon::find($id)->$day;
-        $start_time = new Carbon($request['date'].' '.$salon['open']);
+        $start_time = new Carbon($request['date'].' '.@$salon['open']);
 
-        $end_time = new Carbon($request['date'].' '.$salon['close']);
+        $end_time = new Carbon($request['date'].' '.@$salon['close']);
         $diff_in_minutes = $start_time->diffInMinutes($end_time);
         for ($i=0; $i <= $diff_in_minutes; $i+=30) {  
             if($start_time >= $end_time ){
@@ -604,11 +662,15 @@ class UserApiController extends Controller
     // select emp
     public function selectEmp(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'start_time' => 'bail|required',
             'service' => 'bail|required',
             'date' => 'bail|required',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
     
         $salon_id = Salon::first()->salon_id;
         $emp_array = array();
@@ -636,8 +698,8 @@ class UserApiController extends Controller
         {
             $employee = $emp->$day;
            
-            $start_time = new Carbon($request['date'].' '.$employee['open']);
-            $end_time = new Carbon($request['date'].' '.$employee['close']);
+            $start_time = new Carbon($request['date'].' '.@$employee['open']);
+            $end_time = new Carbon($request['date'].' '.@$employee['close']);
             $end_time = $end_time->subMinutes(1);
         
             if($time->between($start_time, $end_time)) {
@@ -694,7 +756,7 @@ class UserApiController extends Controller
     // booking / notification
     public function booking(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'emp_id' => 'bail|required',
             'service_id' => 'bail|required',
             'payment' => 'bail|required',
@@ -703,6 +765,10 @@ class UserApiController extends Controller
             'payment_type' => 'bail|required',
             'payment_token' => 'required_if:payment_type,STRIPE,ROZAR,PAYPAL',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $salon_id = Salon::first()->salon_id;
         $booking = new Booking();
@@ -925,12 +991,15 @@ class UserApiController extends Controller
     // Add review
     public function addReview(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'message' => 'bail|required', 
             'rate' => 'bail|required',
             'booking_id' => 'bail|required',
         ]);
         $salon_id = Salon::first()->salon_id;
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $added = Review::where('booking_id',$request->booking_id)->first();
         if($added) {
@@ -1024,10 +1093,8 @@ class UserApiController extends Controller
     }
     public function enterpreneurregister(Request $request)
     {
-         // dd($request->all());
-
-
-        $request->validate([
+         //dd($request->all());
+        $validator = Validator::make($request->all(), [
             'name' => 'bail|required',
              'email' => 'bail|required',
              'code' => 'bail|required',
@@ -1035,8 +1102,9 @@ class UserApiController extends Controller
              'password' => 'bail|required|min:8',
              'file' => 'required|mimes:pdf|max:2048'
         ]);
-
-         // dd('ssss');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
          $enterpreneur = new User();
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -1056,12 +1124,59 @@ class UserApiController extends Controller
          $enterpreneur->status=$request->status;
         //  $enterpreneur->file=$request->file->hashname();
          $enterpreneur->save();
-
-
          
          return response([
             "status" => true,
             "message" => "Data has been Added",
+        ], 200 );
+    }
+
+
+    public function media_upload(Request $request)
+    {
+         //dd($request->all());
+
+        $val_arr = [
+                    'user_id' => 'bail|required',
+                    'title' => 'bail|required',
+                    'description' => 'bail|required',
+                    // 'media_file' => 'required|mimes:pdf|max:2048'
+                    'media_file' => 'required|mimes:mp4,avi,mov,wmv|max:2048000', // Max file size in kilobytes (KB)
+
+                ];
+
+        if($request->is_blocked != '' && $request->is_blocked == 1){
+           $val_arr['reason'] = 'bail|required';
+        }
+        
+        $validator = Validator::make($request->all(), $val_arr);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+         $media = new Media();
+        if ($request->hasFile('media_file')) {
+            $file = $request->file('media_file');
+            $ext = $file->getClientOriginalExtension();
+            $filename = time() . '.' . $ext;
+            $file->move('storage/videos/media/', $filename);
+
+            $media->media_file = $filename;
+        }
+         $media->user_id=$request->user_id;
+         $media->title=$request->title;
+         $media->description=$request->description;
+
+         if($request->is_blocked != '' && $request->is_blocked == 1){
+            $media->is_blocked=$request->is_blocked;
+            $media->reason=$request->reason;
+         }
+        
+         $media->save();
+         
+         return response([
+            "status" => true,
+            "message" => "Media has been Added",
         ], 200 );
     }
 }

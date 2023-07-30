@@ -117,7 +117,7 @@ class EmployeeController extends Controller
     {
         $emp = Employee::find($id);
         $salon = Salon::where('owner_id', Auth()->user()->id)->first();
-        $services = Service::where([['salon_id', $salon->salon_id],['isdelete',0]])->orderBy('cat_id', 'ASC')->get();
+        $services = Service::where([['salon_id', $salon->salon_id],['emp_id', $id],['isdelete',0]])->orderBy('cat_id', 'ASC')->get();
 
         $appointment = Booking::where('emp_id',$id)->get();
         $arr = array();

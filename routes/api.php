@@ -18,6 +18,21 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post('/enterpreneur','api\UserApiController@enterpreneurregister');
 Route::post('/login', 'api\UserApiController@login');
+
+Route::post('/createToken', 'api\StripeController@createToken');
+Route::post('/Charge', 'api\StripeController@Charge');
+Route::post('/PaymentIntent', 'api\StripeController@PaymentIntent');
+Route::post('/createPaymentMethod', 'api\StripeController@createPaymentMethod');
+Route::post('/new_one', 'api\StripeController@new_one');
+Route::post('/second_one', 'api\StripeController@second_one');
+
+
+
+Route::post('/createCustomer', 'api\StripeController@createCustomer');
+Route::post('/generateCardToken', 'api\StripeController@generateCardToken');
+Route::post('/createInvoiceAndPayWithDebitCard', 'api\StripeController@createInvoiceAndPayWithDebitCard');
+Route::post('/card_chk', 'api\StripeController@card_chk');
+
 Route::post('/register', 'api\UserApiController@register');
 Route::post('/register1', 'api\UserApiController@update');
 Route::post('/forgetpassword', 'api\UserApiController@forgetPassword');
@@ -40,6 +55,10 @@ Route::post('/timeslot', 'api\UserApiController@timeSlot');
 Route::post('/selectemp', 'api\UserApiController@selectEmp'); 
 
 Route::post('usercategory','api\UserApiController@addusercategory');
+
+Route::post('/media_upload','api\UserApiController@media_upload');
+
+
 Route::middleware('auth:api')->group(function()
 {
     Route::get('/profile', 'api\UserApiController@showUser');
@@ -62,5 +81,8 @@ Route::middleware('auth:api')->group(function()
 
     Route::get('/notification', 'api\UserApiController@notification');
     Route::get('/payment_gateway', 'api\UserApiController@payment_gateway');
+
+
     
 });
+

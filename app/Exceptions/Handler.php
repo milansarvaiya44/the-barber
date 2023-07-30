@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Stripe\Exception\CardException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -50,6 +51,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof CardException) {
+            // Handle the CardException here
+            $message = $exception->getMessage();
+
+            return response()->json(['error' => 'Card Error: ' . $message], 422);
+        }
         return parent::render($request, $exception);
     }
 }

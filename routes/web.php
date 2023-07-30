@@ -127,6 +127,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function()
     Route::get('/banner/delete/{id}', 'admin\BannerController@destroy');
     Route::post('/banner/hideBanner', 'admin\BannerController@hideBanner');
     
+
+    // Banner
+    Route::resource('/video', 'admin\VideoController');
+    Route::get('/video', 'admin\VideoController@index');
+
+
     // Offer
     Route::resource('/offer', 'admin\OfferController');
     Route::get('/offer', 'admin\OfferController@index');
